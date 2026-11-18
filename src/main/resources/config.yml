@@ -1,0 +1,18 @@
+
+# DcLink Configuration
+
+discord:
+  link: "https://discord.gg/yourinvite"
+
+  message: "&a&lJoin Our Server's &5&lDISCORD!"
+
+  title:
+    enabled: true
+    line1: "&a&lJoin Our Server's"
+    line2: "&5&lDISCORD !"
+
+  announcement:
+    enabled: true
+    message: "&aJoin our Discord community!"
+    interval: "30m"
+    
