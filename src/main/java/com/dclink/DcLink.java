@@ -10,15 +10,16 @@ public final class DcLink extends JavaPlugin {
 
         saveDefaultConfig();
 
-        getLogger().info("DcLink has been enabled!");
-        getLogger().info("Discord Integration System is ready!");
+        getCommand("discord").setExecutor(
+                new DiscordCommand(this)
+        );
 
+        getLogger().info("DcLink enabled successfully!");
+        getLogger().info("Discord system is ready!");
     }
 
     @Override
     public void onDisable() {
-
-        getLogger().info("DcLink has been disabled!");
-
+        getLogger().info("DcLink disabled!");
     }
 }
