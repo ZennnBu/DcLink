@@ -1,0 +1,19 @@
+
+name: DcLink
+version: 1.0.0
+main: com.dclink.DcLink
+api-version: '1.21'
+author: DcLink
+description: Discord Integration System
+
+commands:
+  discord:
+    description: Discord integration commands
+    usage: /discord
+    aliases: [dc]
+
+permissions:
+  dclink.admin:
+    description: Allows managing DcLink
+    default: op
+    
