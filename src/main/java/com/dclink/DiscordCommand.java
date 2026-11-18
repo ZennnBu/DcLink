@@ -1,8 +1,15 @@
 
 package com.dclink;
 
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Arrays;
 
@@ -15,56 +22,90 @@ public class DiscordCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender,
-            Command command, String label, String[] args) {
+    public boolean onCommand(
+            CommandSender sender,
+            Command command,
+            String label,
+            String[] args) {
 
         if (args.length == 0) {
+
             if (!(sender instanceof Player player)) {
                 sender.sendMessage("Players only!");
                 return true;
             }
 
-            String link = plugin.getConfig().getString("discord.link");
-
-            player.sendTitle(
-                color(plugin.getConfig().getString("discord.title.line1")),
-                color(plugin.getConfig().getString("discord.title.line2")),
-                10, 60, 10
+            String link = plugin.getConfig().getString(
+                    "discord.link",
+                    "https://discord.gg/yourinvite"
             );
 
-            player.sendMessage(color(
-                plugin.getConfig().getString("discord.message")
-            ));
+            String line1 = plugin.getConfig().getString(
+                    "discord.title.line1",
+                    "&a&lJoin Our Server's"
+            );
+
+            String line2 = plugin.getConfig().getString(
+                    "discord.title.line2",
+                    "&5&lDISCORD !"
+            );
+
+            String message = plugin.getConfig().getString(
+                    "discord.message",
+                    "&aJoin our Discord community!"
+            );
+
+            player.sendTitle(
+                    color(line1),
+                    color(line2),
+                    10, 60, 10
+            );
+
+            player.sendMessage(color(message));
 
             player.sendMessage(
-                "§d§l[ CLICK TO JOIN DISCORD ]"
+                    Component.text("[ OPEN DISCORD ]")
+                            .color(NamedTextColor.GREEN)
+                            .clickEvent(ClickEvent.openUrl(link))
+                            .hoverEvent(HoverEvent.showText(
+                                    Component.text("Click to open Discord")
+                            ))
+            );
+
+            player.sendMessage(
+                    Component.text("[ COPY LINK ]")
+                            .color(NamedTextColor.LIGHT_PURPLE)
+                            .clickEvent(ClickEvent.copyToClipboard(link))
+                            .hoverEvent(HoverEvent.showText(
+                                    Component.text("Click to copy Discord link")
+                            ))
             );
 
             return true;
         }
 
         if (!sender.hasPermission("dclink.admin")) {
-            sender.sendMessage("§cNo permission!");
+            sender.sendMessage("§cYou don't have permission!");
             return true;
         }
 
-        if (args.length >= 3 &&
-                args[0].equalsIgnoreCase("msg") &&
-                args[1].equalsIgnoreCase("set")) {
+        if (args.length >= 3
+                && args[0].equalsIgnoreCase("msg")
+                && args[1].equalsIgnoreCase("set")) {
 
             String msg = String.join(" ",
-                Arrays.copyOfRange(args, 2, args.length));
+                    Arrays.copyOfRange(args, 2, args.length));
 
             plugin.getConfig().set("discord.message", msg);
             plugin.saveConfig();
 
-            sender.sendMessage("§aMessage updated!");
+            sender.sendMessage("§aDiscord message updated!");
             return true;
         }
 
-        if (args.length == 3 &&
-                args[0].equalsIgnoreCase("link") &&
-                args[1].equalsIgnoreCase("set")) {
+        if (args.length == 3
+                && args[0].equalsIgnoreCase("link")
+                && args[1].equalsIgnoreCase("set")) {
 
             String link = args[2];
 
@@ -81,8 +122,8 @@ public class DiscordCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length == 1 &&
-                args[0].equalsIgnoreCase("reload")) {
+        if (args.length == 1
+                && args[0].equalsIgnoreCase("reload")) {
 
             plugin.reloadConfig();
             sender.sendMessage("§aDcLink reloaded!");
