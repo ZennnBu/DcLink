@@ -3,11 +3,9 @@ package com.dclink;
 
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-
 import java.util.Arrays;
 
 public class DiscordCommand implements CommandExecutor {
@@ -28,7 +26,8 @@ public class DiscordCommand implements CommandExecutor {
                 return true;
             }
 
-            String link = plugin.getConfig().getString("discord.link");
+            String link = plugin.getConfig().getString(
+                "discord.link", "https://discord.gg/yourinvite");
 
             player.sendTitle(
                 color(plugin.getConfig().getString("discord.title.line1")),
@@ -37,8 +36,7 @@ public class DiscordCommand implements CommandExecutor {
             );
 
             player.sendMessage(color(
-                plugin.getConfig().getString("discord.message")
-            ));
+                plugin.getConfig().getString("discord.message")));
 
             player.sendMessage(Component.text("[ OPEN DISCORD ]")
                 .color(NamedTextColor.GREEN)
@@ -52,12 +50,11 @@ public class DiscordCommand implements CommandExecutor {
         }
 
         if (!sender.hasPermission("dclink.admin")) {
-            sender.sendMessage("§cYou don't have permission!");
+            sender.sendMessage("§cNo permission!");
             return true;
         }
 
-        if (args.length >= 3
-                && args[0].equalsIgnoreCase("msg")
+        if (args.length >= 3 && args[0].equalsIgnoreCase("msg")
                 && args[1].equalsIgnoreCase("set")) {
 
             String msg = String.join(" ",
@@ -65,63 +62,50 @@ public class DiscordCommand implements CommandExecutor {
 
             plugin.getConfig().set("discord.message", msg);
             plugin.saveConfig();
-
-            sender.sendMessage("§aDiscord message updated!");
+            sender.sendMessage("§aMessage updated!");
             return true;
         }
 
-        if (args.length == 3
-                && args[0].equalsIgnoreCase("link")
+        if (args.length == 3 && args[0].equalsIgnoreCase("link")
                 && args[1].equalsIgnoreCase("set")) {
 
             String link = args[2];
 
-            if (!link.startsWith("https://discord.gg/")
-                    && !link.startsWith("https://discord.com/")) {
+            if (!link.matches("https://(discord\\.gg|discord\\.com)/.+")) {
                 sender.sendMessage("§cInvalid Discord link!");
                 return true;
             }
 
             plugin.getConfig().set("discord.link", link);
             plugin.saveConfig();
-
             sender.sendMessage("§aDiscord link updated!");
             return true;
         }
 
-        if (args.length >= 3
-                && args[0].equalsIgnoreCase("anc")
+        if (args.length >= 3 && args[0].equalsIgnoreCase("anc")
                 && args[1].equalsIgnoreCase("set")) {
 
-            String message = String.join(" ",
+            String msg = String.join(" ",
                 Arrays.copyOfRange(args, 2, args.length));
 
             plugin.getConfig().set(
-                "discord.announcement.message", message);
+                "discord.announcement.message", msg);
 
             plugin.saveConfig();
-
-            sender.sendMessage("§aAnnouncement message updated!");
+            sender.sendMessage("§aAnnouncement updated!");
             return true;
         }
 
-        if (args.length == 5
-                && args[0].equalsIgnoreCase("anc")
+        if (args.length == 4 && args[0].equalsIgnoreCase("anc")
                 && args[1].equalsIgnoreCase("time")
                 && args[2].equalsIgnoreCase("set")) {
 
             String time = args[3];
 
-            sender.sendMessage("§cUsage: /discord anc time set <time>");
-            return true;
-        }
-
-        if (args.length == 4
-                && args[0].equalsIgnoreCase("anc")
-                && args[1].equalsIgnoreCase("time")
-                && args[2].equalsIgnoreCase("set")) {
-
-            String time = args[3];
+            if (!time.matches("[1-9][0-9]*[mh]")) {
+                sender.sendMessage("§cUse: 10m, 30m, 1h or 2h");
+                return true;
+            }
 
             plugin.getConfig().set(
                 "discord.announcement.interval", time);
@@ -129,16 +113,13 @@ public class DiscordCommand implements CommandExecutor {
             plugin.saveConfig();
             plugin.getAnnouncementManager().restart();
 
-            sender.sendMessage("§aAnnouncement interval updated to " + time);
+            sender.sendMessage("§aAnnouncement time set to " + time);
             return true;
         }
 
-        if (args.length == 1
-                && args[0].equalsIgnoreCase("reload")) {
-
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             plugin.reloadConfig();
             plugin.getAnnouncementManager().restart();
-
             sender.sendMessage("§aDcLink reloaded!");
             return true;
         }
